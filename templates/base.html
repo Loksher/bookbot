@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Pet Battle Arena</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: #1a1a2e;
+      color: #e0e0e0;
+      font-family: 'Courier New', Courier, monospace;
+      min-height: 100vh;
+    }
+
+    nav {
+      background: #16213e;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      border-bottom: 2px solid #e94560;
+    }
+    nav .logo { font-size: 1.15em; font-weight: bold; color: #fff; letter-spacing: 2px; }
+    nav a { color: #e94560; text-decoration: none; font-weight: bold; letter-spacing: 1px; }
+    nav a:hover { color: #ff8fa3; }
+
+    main { max-width: 860px; margin: 0 auto; padding: 28px 20px; }
+
+    h1 {
+      color: #e94560;
+      font-size: 1.4em;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    h2 {
+      color: #a29bfe;
+      font-size: 1em;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin: 28px 0 12px;
+    }
+
+    .card {
+      background: #16213e;
+      border: 1px solid #0f3460;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 12px;
+    }
+
+    .btn {
+      background: #e94560;
+      color: #fff;
+      border: none;
+      padding: 10px 22px;
+      cursor: pointer;
+      font-family: monospace;
+      font-size: 0.95em;
+      letter-spacing: 1px;
+      border-radius: 4px;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn:hover { background: #ff6b6b; }
+    .btn-secondary { background: #0f3460; }
+    .btn-secondary:hover { background: #1c4a7a; }
+
+    label { display: block; margin-bottom: 4px; color: #a29bfe; font-size: 0.9em; }
+
+    input[type="text"], select {
+      background: #0f3460;
+      color: #e0e0e0;
+      border: 1px solid #1c4a7a;
+      padding: 8px 12px;
+      font-family: monospace;
+      font-size: 0.95em;
+      border-radius: 4px;
+      width: 100%;
+      margin-bottom: 14px;
+    }
+    input[type="text"]:focus, select:focus {
+      outline: none;
+      border-color: #e94560;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: #e94560;
+      margin: 4px 0 0;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 3px;
+      font-size: 0.78em;
+      font-weight: bold;
+      letter-spacing: 0.5px;
+    }
+    .tag-striker  { background: #d63031; }
+    .tag-drifter  { background: #00b894; color: #000; }
+    .tag-guardian { background: #0984e3; }
+    .tag-aggressive { background: #c0392b; }
+    .tag-defensive  { background: #2980b9; }
+    .tag-tricky     { background: #8e44ad; }
+
+    a { color: #e94560; }
+  </style>
+</head>
+<body>
+<nav>
+  <span class="logo">ARENA</span>
+  <a href="/">Lobby</a>
+  <a href="/register">Register Pet</a>
+</nav>
+<main>
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

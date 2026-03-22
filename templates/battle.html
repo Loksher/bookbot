@@ -1,0 +1,167 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Battle Replay</h1>
+<div style="color:#636e72;font-size:0.88em;margin-bottom:20px">
+  {{ battle.pet_a_name }} ({{ battle.pet_a_owner }}) vs {{ battle.pet_b_name }} ({{ battle.pet_b_owner }})
+</div>
+
+<!-- HP bars -->
+<div style="display:flex;gap:16px;margin-bottom:24px;align-items:flex-end">
+  <div style="flex:1">
+    <div style="font-weight:bold;color:#e94560;margin-bottom:5px">{{ battle.pet_a_name }}</div>
+    <div style="background:#0f3460;border-radius:4px;height:18px;overflow:hidden">
+      <div id="hp-bar-a"
+           style="background:#e94560;height:100%;width:100%;border-radius:4px;transition:width 0.4s ease"></div>
+    </div>
+    <div id="hp-text-a" style="font-size:0.82em;color:#a29bfe;margin-top:3px">
+      {{ battle.pet_a_max_hp }} / {{ battle.pet_a_max_hp }} HP
+    </div>
+  </div>
+
+  <div style="color:#e94560;font-weight:bold;font-size:1.3em;padding-bottom:18px">VS</div>
+
+  <div style="flex:1;text-align:right">
+    <div style="font-weight:bold;color:#0984e3;margin-bottom:5px">{{ battle.pet_b_name }}</div>
+    <div style="background:#0f3460;border-radius:4px;height:18px;overflow:hidden">
+      <div id="hp-bar-b"
+           style="background:#0984e3;height:100%;width:100%;border-radius:4px;transition:width 0.4s ease"></div>
+    </div>
+    <div id="hp-text-b" style="font-size:0.82em;color:#a29bfe;margin-top:3px">
+      {{ battle.pet_b_max_hp }} / {{ battle.pet_b_max_hp }} HP
+    </div>
+  </div>
+</div>
+
+<!-- Playback controls -->
+<div style="display:flex;gap:8px;align-items:center;margin-bottom:20px;flex-wrap:wrap">
+  <span style="color:#636e72;font-size:0.85em">Speed:</span>
+  <button class="btn btn-secondary" onclick="setSpeed(1600)">Slow</button>
+  <button class="btn btn-secondary" id="btn-normal" onclick="setSpeed(800)"
+          style="border:1px solid #e94560">Normal</button>
+  <button class="btn btn-secondary" onclick="setSpeed(220)">Fast</button>
+  <button class="btn btn-secondary" onclick="skipAll()" style="margin-left:8px">Skip All</button>
+</div>
+
+<!-- Turn log -->
+<div id="turn-log"></div>
+
+<!-- Result banner (hidden until battle ends) -->
+<div id="result-banner"
+     style="display:none;text-align:center;padding:36px 20px;
+            background:#16213e;border:2px solid #e94560;border-radius:8px;margin-top:24px">
+  <div id="result-text" style="font-size:2em;font-weight:bold;color:#e94560;margin-bottom:6px"></div>
+  <div id="result-sub" style="color:#636e72;margin-bottom:20px"></div>
+  <a href="/" class="btn btn-secondary">← Back to Lobby</a>
+</div>
+
+<script>
+const battle = {{ battle | tojson }};
+const turns  = battle.turns_data;
+const maxHpA = battle.pet_a_max_hp;
+const maxHpB = battle.pet_b_max_hp;
+
+let delay       = 800;
+let turnIndex   = 0;
+let autoTimer   = null;
+
+const TYPE_COLORS = { aggressive: '#c0392b', defensive: '#2980b9', tricky: '#8e44ad' };
+
+function setSpeed(ms) {
+  delay = ms;
+}
+
+function hpPct(hp, max) {
+  return Math.max(0, Math.min(100, (hp / max) * 100)).toFixed(1);
+}
+
+function typeTag(type) {
+  const bg = TYPE_COLORS[type] || '#555';
+  return `<span style="background:${bg};padding:1px 7px;border-radius:3px;font-size:0.75em;margin-left:5px">${type}</span>`;
+}
+
+function renderTurn(t) {
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.style.cssText = 'opacity:0;transition:opacity 0.3s';
+
+  const hpChangeA = t.pet_a_hp_change > 0
+    ? `<span style="color:#ff7675;font-size:0.83em;margin-left:8px">&#8722;${t.pet_a_hp_change}</span>` : '';
+  const hpChangeB = t.pet_b_hp_change > 0
+    ? `<span style="color:#ff7675;font-size:0.83em;margin-left:8px">&#8722;${t.pet_b_hp_change}</span>` : '';
+
+  const swapA = t.pet_a_swapped
+    ? '<span style="color:#f9ca24;font-size:0.78em;margin-right:4px">&#10022; SWAP</span>' : '';
+  const swapB = t.pet_b_swapped
+    ? '<span style="color:#f9ca24;font-size:0.78em;margin-right:4px">&#10022; SWAP</span>' : '';
+
+  el.innerHTML = `
+    <div style="color:#636e72;font-size:0.82em;margin-bottom:10px;letter-spacing:1px">
+      &mdash; Turn ${t.turn} &mdash;
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      <div>
+        <div style="font-weight:bold;color:#e94560;margin-bottom:4px">${battle.pet_a_name}</div>
+        <div style="margin-bottom:4px">
+          ${swapA}<strong>${t.pet_a_card}</strong>${typeTag(t.pet_a_card_type)}${hpChangeA}
+        </div>
+        <div style="color:#a29bfe;font-size:0.83em;font-style:italic">&ldquo;${t.pet_a_flavor}&rdquo;</div>
+      </div>
+      <div>
+        <div style="font-weight:bold;color:#0984e3;margin-bottom:4px">${battle.pet_b_name}</div>
+        <div style="margin-bottom:4px">
+          ${swapB}<strong>${t.pet_b_card}</strong>${typeTag(t.pet_b_card_type)}${hpChangeB}
+        </div>
+        <div style="color:#a29bfe;font-size:0.83em;font-style:italic">&ldquo;${t.pet_b_flavor}&rdquo;</div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('turn-log').appendChild(el);
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+
+  // Update HP bars.
+  document.getElementById('hp-bar-a').style.width = hpPct(t.pet_a_hp, maxHpA) + '%';
+  document.getElementById('hp-text-a').textContent =
+    `${t.pet_a_hp} / ${maxHpA} HP`;
+  document.getElementById('hp-bar-b').style.width = hpPct(t.pet_b_hp, maxHpB) + '%';
+  document.getElementById('hp-text-b').textContent =
+    `${t.pet_b_hp} / ${maxHpB} HP`;
+
+  el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function showResult() {
+  const banner = document.getElementById('result-banner');
+  const text   = document.getElementById('result-text');
+  const sub    = document.getElementById('result-sub');
+  banner.style.display = 'block';
+  text.textContent = battle.winner ? `${battle.winner} wins!` : 'DRAW';
+  sub.textContent  = `${battle.turns} turns played`;
+  banner.scrollIntoView({ behavior: 'smooth' });
+}
+
+function nextTurn() {
+  if (turnIndex >= turns.length) {
+    showResult();
+    return;
+  }
+  renderTurn(turns[turnIndex]);
+  turnIndex++;
+  autoTimer = setTimeout(nextTurn, delay);
+}
+
+function skipAll() {
+  clearTimeout(autoTimer);
+  for (let i = turnIndex; i < turns.length; i++) {
+    renderTurn(turns[i]);
+  }
+  turnIndex = turns.length;
+  showResult();
+}
+
+// Start playback after a short pause.
+setTimeout(nextTurn, 600);
+</script>
+
+{% endblock %}

@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h1>Register Your Pet</h1>
+
+<div class="card" style="max-width:540px">
+  <form method="POST" action="/register">
+
+    <label>Your Name</label>
+    <input type="text" name="owner" placeholder="Player name" maxlength="30" required>
+
+    <label>Pet Name</label>
+    <input type="text" name="name" placeholder="Give your pet a name" maxlength="20" required>
+
+    <label style="margin-bottom:8px">Archetype</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+
+      {% set archetypes = [
+        ("striker",  "Striker",  "Fast & aggressive. High attack, low defense.",     "75 HP · 13 ATK · 3 DEF · 9 SPD"),
+        ("drifter",  "Drifter",  "Versatile all-rounder. No big weaknesses.",        "85 HP · 10 ATK · 5 DEF · 6 SPD"),
+        ("guardian", "Guardian", "Tanky and patient. High HP, strong defenses.",     "100 HP · 8 ATK · 8 DEF · 4 SPD"),
+      ] %}
+
+      {% for val, label, desc, stats in archetypes %}
+      <label class="archetype-opt" data-val="{{ val }}"
+             style="background:#0f3460;border:2px solid #1c4a7a;border-radius:6px;
+                    padding:10px;cursor:pointer;color:#e0e0e0;display:block;width:auto;
+                    margin-bottom:0">
+        <input type="radio" name="archetype" value="{{ val }}"
+               {% if val == "drifter" %}checked{% endif %}
+               style="display:none">
+        <span class="tag tag-{{ val }}" style="display:block;margin-bottom:6px">{{ label }}</span>
+        <span style="font-size:0.78em;color:#a29bfe;display:block;margin-bottom:4px">{{ desc }}</span>
+        <span style="font-size:0.74em;color:#636e72;display:block">{{ stats }}</span>
+      </label>
+      {% endfor %}
+
+    </div>
+
+    <div style="color:#a29bfe;font-size:0.85em;letter-spacing:1px;text-transform:uppercase;
+                margin-bottom:12px">Personality</div>
+
+    {% set sliders = [
+      ("aggression", "Aggression", "Lean toward aggressive attack cards"),
+      ("caution",    "Caution",    "Lean toward defensive / shield cards"),
+      ("cunning",    "Cunning",    "Lean toward tricky / status cards"),
+      ("bold",       "Bold",       "Prefer slow, high-damage plays"),
+    ] %}
+    {% for field, label, desc in sliders %}
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px">
+        <span style="color:#e0e0e0">{{ label }}
+          <span style="color:#636e72;font-size:0.82em;margin-left:6px">{{ desc }}</span>
+        </span>
+        <span id="{{ field }}-val" style="color:#e94560;font-weight:bold;min-width:18px;text-align:right">5</span>
+      </div>
+      <input type="range" name="{{ field }}" min="1" max="10" value="5"
+             oninput="document.getElementById('{{ field }}-val').textContent = this.value">
+    </div>
+    {% endfor %}
+
+    <button type="submit" class="btn" style="width:100%;margin-top:8px">Register Pet</button>
+  </form>
+</div>
+
+<script>
+  // Highlight the selected archetype card.
+  const opts = document.querySelectorAll('.archetype-opt');
+  function updateHighlight() {
+    opts.forEach(el => {
+      const checked = el.querySelector('input[type="radio"]').checked;
+      el.style.borderColor = checked ? '#e94560' : '#1c4a7a';
+    });
+  }
+  opts.forEach(el => {
+    el.addEventListener('click', () => {
+      el.querySelector('input[type="radio"]').checked = true;
+      updateHighlight();
+    });
+  });
+  updateHighlight();
+</script>
+
+{% endblock %}

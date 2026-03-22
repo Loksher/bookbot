@@ -100,3 +100,48 @@ def make_glacius() -> Pet:
             aggression=0.2, caution=0.7, cunning=0.4, bold=0.3
         ),
     )
+
+
+# ---------------------------------------------------------------------------
+# Custom pet factory for the web server / multiplayer mode
+# ---------------------------------------------------------------------------
+
+#: Maps archetype name to (hp, attack, defense, speed, intuition, cards).
+_ARCHETYPES: dict[str, tuple[int, int, int, int, int, list[AbilityCard]]] = {
+    "striker": (75, 13, 3, 9, 7, [IRON_FANG, QUICKSTRIKE, ROCKSLIDE, SMOKESCREEN]),
+    "drifter": (85, 10, 5, 6, 6, [QUICKSTRIKE, DRAIN_BITE, MIRROR_STANCE, ROCKSLIDE]),
+    "guardian": (100, 8, 8, 4, 3, [STONE_WALL, STATIC_VEIL, DRAIN_BITE, ROCKSLIDE]),
+}
+
+
+def make_custom_pet(
+    name: str,
+    archetype: str,
+    aggression: float,
+    caution: float,
+    cunning: float,
+    bold: float,
+) -> Pet:
+    """Create a player-defined pet from an archetype + personality weights.
+
+    archetype must be one of: "striker", "drifter", "guardian".
+    Personality weights should be floats in [0.0, 1.0].
+    """
+    archetype = archetype if archetype in _ARCHETYPES else "drifter"
+    hp, attack, defense, speed, intuition, cards = _ARCHETYPES[archetype]
+    return Pet(
+        name=name,
+        hp=hp,
+        max_hp=hp,
+        attack=attack,
+        defense=defense,
+        speed=speed,
+        intuition=intuition,
+        ability_cards=cards,
+        personality=PersonalityProfile(
+            aggression=max(0.0, min(1.0, aggression)),
+            caution=max(0.0, min(1.0, caution)),
+            cunning=max(0.0, min(1.0, cunning)),
+            bold=max(0.0, min(1.0, bold)),
+        ),
+    )

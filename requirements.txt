@@ -1,2 +1,5 @@
 # No external dependencies for core game — stdlib only.
 # Add here when wiring in a real LLM backend (e.g. httpx, anthropic).
+
+# Web server for multiplayer test mode (run with: flask --app server run)
+flask
