@@ -31,7 +31,8 @@ app = Flask(__name__)
 # pet_id -> {id, owner, name, archetype, pet: Pet, personality: dict}
 _pets: dict[str, dict] = {}
 
-# battle_id -> {id, pet_a_name, pet_b_name, pet_a_max_hp, pet_b_max_hp,
+# battle_id -> {id, pet_a_id, pet_b_id, pet_a_name, pet_b_name,
+#               pet_a_owner, pet_b_owner, pet_a_max_hp, pet_b_max_hp,
 #               winner, turns, turns_data: list[dict]}
 _battles: dict[str, dict] = {}
 
@@ -42,6 +43,7 @@ _battles: dict[str, dict] = {}
 
 @app.route("/")
 def index():
+    """Lobby: show all registered pets and past battle history."""
     return render_template(
         "index.html",
         pets=list(_pets.values()),
@@ -51,10 +53,11 @@ def index():
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
+    """GET: show the pet registration form. POST: create a pet and redirect to lobby."""
     if request.method == "POST":
         owner = (request.form.get("owner") or "Unknown").strip() or "Unknown"
         name = (request.form.get("name") or "Pet").strip() or "Pet"
-        archetype = request.form.get("archetype", "drifter")
+        archetype = (request.form.get("archetype", "").strip() or "drifter")
 
         # Sliders come in as integers 1–10; convert to 0.0–1.0 floats.
         def _slider(field: str) -> float:
@@ -88,6 +91,7 @@ def register():
 
 @app.route("/battle", methods=["POST"])
 def start_battle():
+    """Run a battle between two registered pets and redirect to the replay page."""
     pet_a_id = request.form.get("pet_a", "")
     pet_b_id = request.form.get("pet_b", "")
 
@@ -149,6 +153,7 @@ def start_battle():
 
 @app.route("/battle/<battle_id>")
 def view_battle(battle_id: str):
+    """Show the turn-by-turn replay for a completed battle."""
     battle = _battles.get(battle_id)
     if not battle:
         abort(404)

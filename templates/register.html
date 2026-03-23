@@ -65,20 +65,20 @@
 
 <script>
   // Highlight the selected archetype card.
-  const opts = document.querySelectorAll('.archetype-opt');
-  function updateHighlight() {
-    opts.forEach(el => {
+  const archetypeOptions = document.querySelectorAll('.archetype-opt');
+  function syncHighlight() {
+    archetypeOptions.forEach(el => {
       const checked = el.querySelector('input[type="radio"]').checked;
       el.style.borderColor = checked ? '#e94560' : '#1c4a7a';
     });
   }
-  opts.forEach(el => {
+  archetypeOptions.forEach(el => {
     el.addEventListener('click', () => {
       el.querySelector('input[type="radio"]').checked = true;
-      updateHighlight();
+      syncHighlight();
     });
   });
-  updateHighlight();
+  syncHighlight();
 </script>
 
 {% endblock %}

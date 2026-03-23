@@ -232,7 +232,7 @@ def _apply_card(attacker: Pet, defender: Pet, card: AbilityCard) -> None:
     """Apply a card's damage and effect; print resolution lines."""
     damage = 0
     effect_msg = None
-    tier_note = ""
+    tier_note = ""  # TODO: set to " (FAST)" / " (SLOW)" based on speed tier for richer CLI output
 
     if card.damage > 0:
         # `//` is floor division — divides and rounds DOWN to the nearest int.

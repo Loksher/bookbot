@@ -80,39 +80,39 @@ function typeTag(type) {
   return `<span style="background:${bg};padding:1px 7px;border-radius:3px;font-size:0.75em;margin-left:5px">${type}</span>`;
 }
 
-function renderTurn(t) {
+function renderTurn(turn) {
   const el = document.createElement('div');
   el.className = 'card';
   el.style.cssText = 'opacity:0;transition:opacity 0.3s';
 
-  const hpChangeA = t.pet_a_hp_change > 0
-    ? `<span style="color:#ff7675;font-size:0.83em;margin-left:8px">&#8722;${t.pet_a_hp_change}</span>` : '';
-  const hpChangeB = t.pet_b_hp_change > 0
-    ? `<span style="color:#ff7675;font-size:0.83em;margin-left:8px">&#8722;${t.pet_b_hp_change}</span>` : '';
+  const hpChangeA = turn.pet_a_hp_change > 0
+    ? `<span style="color:#ff7675;font-size:0.83em;margin-left:8px">&#8722;${turn.pet_a_hp_change}</span>` : '';
+  const hpChangeB = turn.pet_b_hp_change > 0
+    ? `<span style="color:#ff7675;font-size:0.83em;margin-left:8px">&#8722;${turn.pet_b_hp_change}</span>` : '';
 
-  const swapA = t.pet_a_swapped
+  const swapA = turn.pet_a_swapped
     ? '<span style="color:#f9ca24;font-size:0.78em;margin-right:4px">&#10022; SWAP</span>' : '';
-  const swapB = t.pet_b_swapped
+  const swapB = turn.pet_b_swapped
     ? '<span style="color:#f9ca24;font-size:0.78em;margin-right:4px">&#10022; SWAP</span>' : '';
 
   el.innerHTML = `
     <div style="color:#636e72;font-size:0.82em;margin-bottom:10px;letter-spacing:1px">
-      &mdash; Turn ${t.turn} &mdash;
+      &mdash; Turn ${turn.turn} &mdash;
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
       <div>
         <div style="font-weight:bold;color:#e94560;margin-bottom:4px">${battle.pet_a_name}</div>
         <div style="margin-bottom:4px">
-          ${swapA}<strong>${t.pet_a_card}</strong>${typeTag(t.pet_a_card_type)}${hpChangeA}
+          ${swapA}<strong>${turn.pet_a_card}</strong>${typeTag(turn.pet_a_card_type)}${hpChangeA}
         </div>
-        <div style="color:#a29bfe;font-size:0.83em;font-style:italic">&ldquo;${t.pet_a_flavor}&rdquo;</div>
+        <div style="color:#a29bfe;font-size:0.83em;font-style:italic">&ldquo;${turn.pet_a_flavor}&rdquo;</div>
       </div>
       <div>
         <div style="font-weight:bold;color:#0984e3;margin-bottom:4px">${battle.pet_b_name}</div>
         <div style="margin-bottom:4px">
-          ${swapB}<strong>${t.pet_b_card}</strong>${typeTag(t.pet_b_card_type)}${hpChangeB}
+          ${swapB}<strong>${turn.pet_b_card}</strong>${typeTag(turn.pet_b_card_type)}${hpChangeB}
         </div>
-        <div style="color:#a29bfe;font-size:0.83em;font-style:italic">&ldquo;${t.pet_b_flavor}&rdquo;</div>
+        <div style="color:#a29bfe;font-size:0.83em;font-style:italic">&ldquo;${turn.pet_b_flavor}&rdquo;</div>
       </div>
     </div>
   `;
@@ -121,12 +121,12 @@ function renderTurn(t) {
   requestAnimationFrame(() => { el.style.opacity = '1'; });
 
   // Update HP bars.
-  document.getElementById('hp-bar-a').style.width = hpPct(t.pet_a_hp, maxHpA) + '%';
+  document.getElementById('hp-bar-a').style.width = hpPct(turn.pet_a_hp, maxHpA) + '%';
   document.getElementById('hp-text-a').textContent =
-    `${t.pet_a_hp} / ${maxHpA} HP`;
-  document.getElementById('hp-bar-b').style.width = hpPct(t.pet_b_hp, maxHpB) + '%';
+    `${turn.pet_a_hp} / ${maxHpA} HP`;
+  document.getElementById('hp-bar-b').style.width = hpPct(turn.pet_b_hp, maxHpB) + '%';
   document.getElementById('hp-text-b').textContent =
-    `${t.pet_b_hp} / ${maxHpB} HP`;
+    `${turn.pet_b_hp} / ${maxHpB} HP`;
 
   el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
