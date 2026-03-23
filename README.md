@@ -1,4 +1,4 @@
-# Pet Battle Arena
+# Manager-Pet-Battler
 
 A turn-based pet battle game with personality-driven AI decision-making. Two pets fight using ability cards; each pet's AI weights its choices based on a personality profile that drifts slightly after every battle.
 
